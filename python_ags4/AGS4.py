@@ -807,5 +807,90 @@ def _is_file_like(obj):
     return True
 
 
+def _get_DICT_table_from_json_file(filepath):
+    '''Convert AGS4 dictionary in .json format to DICT table in .ags format.
+
+    The official standard dictionaries in .json format is available at
+    https://gitlab.com/AGS-DFWG-Web/ASG4
+
+    Parameters
+    ----------
+    filepath : str
+        Path to JSON file
+
+    Returns
+    -------
+    Pandas DataFrame with DICT table
+
+    '''
+
+    from pandas import DataFrame, concat
+    import json
+
+    with open(filepath, 'r') as f:
+        json_data = json.load(f)
+
+    # Extract heading DICT_TYPE='HEADING' rows from JSON data
+    heading_rows = DataFrame(json_data).rename(columns={'group': 'DICT_GRP', 'heading': 'DICT_HDNG', 'heading_status': 'DICT_STAT',
+                                                        'suggested_type': 'DICT_DTYP', 'description': 'DICT_DESC', 'suggested_unit': 'DICT_UNIT',
+                                                        'example': 'DICT_EXMP'})\
+                                       .pipe(lambda df: df.assign(DICT_STAT=df.DICT_STAT.map({'*': 'KEY', 'R': 'REQUIRED', '*R': 'KEY+REQUIRED',
+                                                                                              'R*': 'KEY+REQUIRED', '': 'OTHER'})))\
+                                       .assign(HEADING='DATA', DICT_TYPE='HEADING', DICT_REM='', DICT_PGRP='')\
+                                       .pipe(lambda df: df.assign(in_group_order=df.in_group_order.astype('int')))\
+                                       .pipe(lambda df: df.assign(group_order=df.group_order.astype('int')))
+
+    # Extract heading DICT_TYPE='GROUP' rows from JSON data
+    group_rows = heading_rows.groupby('DICT_GRP').first()\
+                             .reset_index()\
+                             .drop('DICT_DESC', axis=1)\
+                             .rename(columns={'group_description': 'DICT_DESC'})\
+                             .pipe(lambda df: df.assign(DICT_PGRP=df['parent']))\
+                             .assign(in_group_order=0, HEADING='DATA', DICT_TYPE='GROUP', DICT_HDNG='', DICT_STAT='', DICT_DTYP='', DICT_EXMP='', DICT_UNIT='')
+
+    # Create UNIT and TYPE rows
+    unit_and_type_rows = DataFrame({'HEADING': ['UNIT', 'TYPE'],
+                                    'DICT_TYPE': ['', 'PA'],
+                                    'DICT_GRP': ['', 'X'],
+                                    'DICT_HDNG': ['', 'X'],
+                                    'DICT_STAT': ['', 'PA'],
+                                    'DICT_DTYP': ['', 'PT'],
+                                    'DICT_DESC': ['', 'X'],
+                                    'DICT_UNIT': ['', 'PU'],
+                                    'DICT_EXMP': ['', 'X'],
+                                    'DICT_PGRP': ['', 'X'],
+                                    'DICT_REM': ['', 'X'],
+                                    'group_order': [-1, 0]})
+
+    # Combine all rows
+    DICT = concat([unit_and_type_rows, heading_rows, group_rows])\
+
+    # Sort rows and keep only relevant columns
+    DICT = DICT.sort_values(by=['group_order', 'in_group_order'])\
+               .loc[:, ['HEADING', 'DICT_TYPE', 'DICT_GRP', 'DICT_HDNG', 'DICT_STAT', 'DICT_DTYP', 'DICT_DESC', 'DICT_UNIT', 'DICT_EXMP', 'DICT_PGRP', 'DICT_REM']]\
+               .reset_index(drop=True)\
+
+    # Found some linebreak characters in the descriptions that are not needed in DICT_DESC
+    # Replace them with spaces
+    DICT.loc[:, 'DICT_DESC'] = DICT.DICT_DESC.str.replace(r'(\n)', ' ', regex=True)
+
+    # Some DICT_DESC entries in the json file are enclosed by double quotes.
+    # These need to be either single quotes or double double quotes according to
+    # AGS4 Rule 5. The library correctly handles this when writing the DICT table
+    # to a .ags file but it was decided to replace double quotes with single
+    # quotes to be consistent with the existing built-in standard dictionary
+    # files
+    DICT.loc[:, 'DICT_DESC'] = DICT.DICT_DESC.str.replace(r'(")', '\'', regex=True)
+
+    # Drop fields in groupsandheadings4-1-1.json but which should not be
+    # included according to the PDF document
+    # TODO: This part can be removed once these fields are removed from the json file
+    fields_to_be_dropped = ['PMTD_ARM1', 'PMTD_ARM2', 'PMTD_ARM2',
+                            'RUCS_E', 'RUCS_MU', 'RUCS_ESTR', 'RUCS_ETYP']
+    DICT = DICT.loc[~DICT.DICT_HDNG.isin(fields_to_be_dropped), :]
+
+    return DICT
+
+
 class AGS4Error(Exception):
     pass
