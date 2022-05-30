@@ -892,5 +892,59 @@ def _get_DICT_table_from_json_file(filepath):
     return DICT
 
 
+def _get_ABBR_table_from_json_file(filepath, version='4.1'):
+    '''Convert AGS4 abbreviations in .json format to ABBR table in .ags format.
+
+    The official ABBR list in .json format is available at
+    https://gitlab.com/AGS-DFWG-Web/ASG4
+
+    Parameters
+    ----------
+    filepath : str
+        Path to JSON file
+    version : str
+        Version of standard dictionary. Only '4.1, and '4.0' are valid entries.
+
+    Returns
+    -------
+    Pandas DataFrame with ABBR table
+
+    '''
+
+    from pandas import DataFrame, concat
+    import json
+
+    # Check version provided by user
+    if version not in ['4.0', '4.1']:
+        raise AGS4Error("Invalid version number. Only '4.0' and '4.1' are valid entries.")
+
+    with open(filepath, 'r') as f:
+        json_data = json.load(f)
+
+    # Extract heading "DATA" rows from JSON data
+    data_rows = DataFrame(json_data).rename(columns={'Group': 'ABBR_HDNG', 'Code': 'ABBR_CODE', 'Description': 'ABBR_DESC'})\
+                                    .assign(HEADING='DATA', ABBR_LIST=version, ABBR_REM='', FILE_FSET='')\
+                                    .pipe(lambda df: df.loc[df['Version'].str.contains(version), :])\
+                                    .sort_values(by=['ABBR_HDNG', 'ABBR_CODE'])
+
+    # Create UNIT and TYPE rows
+    unit_and_type_rows = DataFrame({'HEADING': ['UNIT', 'TYPE'],
+                                    'ABBR_HDNG': ['', 'X'],
+                                    'ABBR_CODE': ['', 'X'],
+                                    'ABBR_DESC': ['', 'X'],
+                                    'ABBR_LIST': ['', 'X'],
+                                    'ABBR_REM': ['', 'X'],
+                                    'FILE_FSET': ['', 'X']})
+
+    # Combine all rows
+    ABBR = concat([unit_and_type_rows, data_rows])\
+
+    # Sort columns and reset index
+    ABBR = ABBR.loc[:, ['HEADING', 'ABBR_HDNG', 'ABBR_CODE', 'ABBR_DESC', 'ABBR_LIST', 'ABBR_REM', 'FILE_FSET']]\
+               .reset_index(drop=True)\
+
+    return ABBR
+
+
 class AGS4Error(Exception):
     pass
