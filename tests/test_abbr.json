@@ -1,0 +1,200 @@
+[
+ {
+   "Group": "ARTW_TYPE",
+   "Code": "DRY",
+   "Description": "Dry test",
+   "Status": "Approved",
+   "Date": "25/05/2010",
+   "Comments": "",
+   "Version": "4.0,4.1"
+ },
+ {
+   "Group": "ARTW_TYPE",
+   "Code": "WET",
+   "Description": "Wet test",
+   "Status": "Approved",
+   "Date": "25/05/2010",
+   "Comments": "",
+   "Version": "4.0,4.1"
+ },
+ {
+   "Group": "BKFL_LEG",
+   "Code": "901",
+   "Description": "Sand backfill",
+   "Status": "Approved",
+   "Date": "25/05/2010",
+   "Comments": "",
+   "Version": "4.0,4.1"
+ },
+ {
+   "Group": "BKFL_LEG",
+   "Code": "902",
+   "Description": "Gravel backfill",
+   "Status": "Approved",
+   "Date": "25/05/2010",
+   "Comments": "",
+   "Version": "4.0,4.1"
+ },
+ {
+   "Group": "BKFL_LEG",
+   "Code": "903",
+   "Description": "Bentonite",
+   "Status": "Approved",
+   "Date": "25/05/2010",
+   "Comments": "",
+   "Version": "4.0,4.1"
+ },
+ {
+   "Group": "BKFL_LEG",
+   "Code": "904",
+   "Description": "Grout",
+   "Status": "Approved",
+   "Date": "25/05/2010",
+   "Comments": "",
+   "Version": "4.0,4.1"
+ },
+ {
+   "Group": "BKFL_LEG",
+   "Code": "905",
+   "Description": "Arisings",
+   "Status": "Approved",
+   "Date": "25/05/2010",
+   "Comments": "",
+   "Version": "4.0,4.1"
+ },
+ {
+   "Group": "BKFL_LEG",
+   "Code": "906",
+   "Description": "Concrete",
+   "Status": "Approved",
+   "Date": "25/05/2010",
+   "Comments": "",
+   "Version": "4.0,4.1"
+ },
+ {
+   "Group": "BKFL_LEG",
+   "Code": "907",
+   "Description": "Asphalt",
+   "Status": "Approved",
+   "Date": "24/12/2013",
+   "Comments": "",
+   "Version": "4.0,4.1"
+ },
+ {
+   "Group": "BKFL_LEG",
+   "Code": "907",
+   "Description": "Tarmacadam",
+   "Status": "Declined",
+   "Date": "09/01/2014",
+   "Comments": "This code is already defined as Asphalt, use BKFL_LEG=Asphalt.",
+   "Version": "4.0"
+ },
+ {
+   "Group": "BKFL_LEG",
+   "Code": "908",
+   "Description": "Ballast",
+   "Status": "Approved",
+   "Date": "24/12/2013",
+   "Comments": "",
+   "Version": "4.0,4.1"
+ },
+ {
+   "Group": "BKFL_LEG",
+   "Code": "908",
+   "Description": "Natural Ground",
+   "Status": "Declined",
+   "Date": "09/01/2014",
+   "Comments": "",
+   "Version": "4.0"
+ },
+ {
+   "Group": "BKFL_LEG",
+   "Code": "909",
+   "Description": "Upstanding cover",
+   "Status": "Approved",
+   "Date": "24/12/2013",
+   "Comments": "",
+   "Version": "4.0,4.1"
+ },
+ {
+   "Group": "BKFL_LEG",
+   "Code": "909",
+   "Description": "Paving Slab",
+   "Status": "Declined",
+   "Date": "09/01/2014",
+   "Comments": "909 is already defined. Use BKFL_LEG=912 instead.",
+   "Version": "4.0"
+ },
+ {
+   "Group": "BKFL_LEG",
+   "Code": "910",
+   "Description": "Flush cover",
+   "Status": "Approved",
+   "Date": "24/12/2013",
+   "Comments": "",
+   "Version": "4.0,4.1"
+ },
+ {
+   "Group": "BKFL_LEG",
+   "Code": "911",
+   "Description": "Natural Ground",
+   "Status": "Declined",
+   "Date": "09/01/2014",
+   "Comments": "This is grass and soil removed from by spade and carefully replaced",
+   "Version": "4.0"
+ },
+ {
+   "Group": "BKFL_LEG",
+   "Code": "911",
+   "Description": "Cement",
+   "Status": "Declined",
+   "Date": "18/10/2018",
+   "Comments": "Presumably this is a wet cement mix without aggregate? It is not necessary to  identify this differently to the vague generalised types of grout and concrete available.",
+   "Version": "4.0"
+ },
+ {
+   "Group": "BKFL_LEG",
+   "Code": "912",
+   "Description": "Paving slab",
+   "Status": "Approved",
+   "Date": "09/01/2014",
+   "Comments": "",
+   "Version": "4.0,4.1"
+ },
+ {
+   "Group": "BKFL_LEG",
+   "Code": "913",
+   "Description": "Timber",
+   "Status": "Approved",
+   "Date": "03/11/2017",
+   "Comments": "",
+   "Version": "4.0,4.1"
+ },
+ {
+   "Group": "BKFL_LEG",
+   "Code": "914",
+   "Description": "Sand and cement",
+   "Status": "Declined",
+   "Date": "01/05/2018",
+   "Comments": "Use BKFL_LEG=Mortar",
+   "Version": "4.0"
+ },
+ {
+   "Group": "BKFL_LEG",
+   "Code": "914",
+   "Description": "Mortar",
+   "Status": "Approved",
+   "Date": "08/12/2020",
+   "Comments": "",
+   "Version": "4.0,4.1"
+ },
+ {
+   "Group": "BKFL_LEG",
+   "Code": "999",
+   "Description": "Void",
+   "Status": "Approved",
+   "Date": "06/07/2016",
+   "Comments": "",
+   "Version": "4.0,4.1"
+ }
+]

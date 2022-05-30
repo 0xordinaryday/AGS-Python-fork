@@ -228,3 +228,10 @@ def test_get_DICT_table_from_json_file():
     tables, headings = AGS4.AGS4_to_dataframe('tests/test_dict.ags')
 
     assert tables['DICT'].equals(DICT)
+
+
+def test_get_ABBR_table_from_json_file():
+    ABBR = AGS4._get_ABBR_table_from_json_file('tests/test_abbr.json')
+    tables, headings = AGS4.AGS4_to_dataframe('tests/test_abbr.ags')
+
+    assert tables['ABBR'].equals(ABBR)
