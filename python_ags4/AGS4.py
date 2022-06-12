@@ -998,5 +998,57 @@ def _get_TYPE_table_from_json_file(filepath, version='4.1'):
     return TYPE
 
 
+def _get_UNIT_table_from_json_file(filepath, version='4.1'):
+    '''Convert AGS4 abbreviations in .json format to UNIT table in .ags format.
+
+    The official UNIT list in .json format is available at
+    https://gitlab.com/AGS-DFWG-Web/ASG4
+
+    Parameters
+    ----------
+    filepath : str
+        Path to JSON file
+    version : str
+        Version of standard dictionary. Only '4.1, and '4.0' are valid entries.
+
+    Returns
+    -------
+    Pandas DataFrame with ABBR table
+
+    '''
+
+    from pandas import DataFrame, concat
+    import json
+
+    # Check version provided by user
+    if version not in ['4.0', '4.1']:
+        raise AGS4Error("Invalid version number. Only '4.0' and '4.1' are valid entries.")
+
+    with open(filepath, 'r') as f:
+        json_data = json.load(f)
+
+    # Extract heading "DATA" rows from JSON data
+    data_rows = DataFrame(json_data).rename(columns={'Unit': 'UNIT_UNIT', 'Description': 'UNIT_DESC'})\
+                                    .assign(HEADING='DATA', UNIT_REM='', FILE_FSET='')\
+                                    .pipe(lambda df: df.loc[df['Version'].str.contains(version), :])\
+                                    .pipe(lambda df: df.loc[df['Status'].str.contains('Approved', case=False), :])\
+
+    # Create UNIT and TYPE rows
+    unit_and_type_rows = DataFrame({'HEADING': ['UNIT', 'TYPE'],
+                                    'UNIT_UNIT': ['', 'X'],
+                                    'UNIT_DESC': ['', 'X'],
+                                    'UNIT_REM': ['', 'X'],
+                                    'FILE_FSET': ['', 'X']})
+
+    # Combine all rows
+    UNIT = concat([unit_and_type_rows, data_rows])\
+
+    # Sort columns and reset index
+    UNIT = UNIT.loc[:, ['HEADING', 'UNIT_UNIT', 'UNIT_DESC', 'UNIT_REM', 'FILE_FSET']]\
+               .reset_index(drop=True)\
+
+    return UNIT
+
+
 class AGS4Error(Exception):
     pass
