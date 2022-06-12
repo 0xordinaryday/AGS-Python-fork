@@ -885,7 +885,7 @@ def _get_DICT_table_from_json_file(filepath):
     # Drop fields in groupsandheadings4-1-1.json but which should not be
     # included according to the PDF document
     # TODO: This part can be removed once these fields are removed from the json file
-    fields_to_be_dropped = ['PMTD_ARM1', 'PMTD_ARM2', 'PMTD_ARM2',
+    fields_to_be_dropped = ['PMTD_ARM1', 'PMTD_ARM2', 'PMTD_ARM3',
                             'RUCS_E', 'RUCS_MU', 'RUCS_ESTR', 'RUCS_ETYP']
     DICT = DICT.loc[~DICT.DICT_HDNG.isin(fields_to_be_dropped), :]
 
