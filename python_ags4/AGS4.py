@@ -947,5 +947,56 @@ def _get_ABBR_table_from_json_file(filepath, version='4.1'):
     return ABBR
 
 
+def _get_TYPE_table_from_json_file(filepath, version='4.1'):
+    '''Convert AGS4 abbreviations in .json format to TYPE table in .ags format.
+
+    The official TYPE list in .json format is available at
+    https://gitlab.com/AGS-DFWG-Web/ASG4
+
+    Parameters
+    ----------
+    filepath : str
+        Path to JSON file
+    version : str
+        Version of standard dictionary. Only '4.1, and '4.0' are valid entries.
+
+    Returns
+    -------
+    Pandas DataFrame with ABBR table
+
+    '''
+
+    from pandas import DataFrame, concat
+    import json
+
+    # Check version provided by user
+    if version not in ['4.0', '4.1']:
+        raise AGS4Error("Invalid version number. Only '4.0' and '4.1' are valid entries.")
+
+    with open(filepath, 'r') as f:
+        json_data = json.load(f)
+
+    # Extract heading "DATA" rows from JSON data
+    data_rows = DataFrame(json_data).rename(columns={'Type': 'TYPE_TYPE', 'Desc': 'TYPE_DESC'})\
+                                    .assign(HEADING='DATA', FILE_FSET='')\
+                                    .pipe(lambda df: df.loc[df['Version'].str.contains(version), :])\
+                                    .sort_values(by=['TYPE_TYPE', 'TYPE_DESC'])
+
+    # Create UNIT and TYPE rows
+    unit_and_type_rows = DataFrame({'HEADING': ['UNIT', 'TYPE'],
+                                    'TYPE_TYPE': ['', 'X'],
+                                    'TYPE_DESC': ['', 'X'],
+                                    'FILE_FSET': ['', 'X']})
+
+    # Combine all rows
+    TYPE = concat([unit_and_type_rows, data_rows])\
+
+    # Sort columns and reset index
+    TYPE = TYPE.loc[:, ['HEADING', 'TYPE_TYPE', 'TYPE_DESC', 'FILE_FSET']]\
+               .reset_index(drop=True)\
+
+    return TYPE
+
+
 class AGS4Error(Exception):
     pass
