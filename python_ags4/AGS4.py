@@ -925,6 +925,7 @@ def _get_ABBR_table_from_json_file(filepath, version='4.1'):
     data_rows = DataFrame(json_data).rename(columns={'Group': 'ABBR_HDNG', 'Code': 'ABBR_CODE', 'Description': 'ABBR_DESC'})\
                                     .assign(HEADING='DATA', ABBR_LIST=version, ABBR_REM='', FILE_FSET='')\
                                     .pipe(lambda df: df.loc[df['Version'].str.contains(version), :])\
+                                    .pipe(lambda df: df.loc[df['Status'].str.contains('Approved', case=False), :])\
                                     .sort_values(by=['ABBR_HDNG', 'ABBR_CODE'])
 
     # Create UNIT and TYPE rows
