@@ -1032,6 +1032,7 @@ def _get_UNIT_table_from_json_file(filepath, version='4.1'):
                                     .assign(HEADING='DATA', UNIT_REM='', FILE_FSET='')\
                                     .pipe(lambda df: df.loc[df['Version'].str.contains(version), :])\
                                     .pipe(lambda df: df.loc[df['Status'].str.contains('Approved', case=False), :])\
+                                    .pipe(lambda df: df.drop_duplicates(subset='UNIT_UNIT', keep='first'))
 
     # Create UNIT and TYPE rows
     unit_and_type_rows = DataFrame({'HEADING': ['UNIT', 'TYPE'],
