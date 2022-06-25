@@ -835,7 +835,7 @@ def _get_DICT_table_from_json_file(filepath):
                                                         'suggested_type': 'DICT_DTYP', 'description': 'DICT_DESC', 'suggested_unit': 'DICT_UNIT',
                                                         'example': 'DICT_EXMP'})\
                                        .pipe(lambda df: df.assign(DICT_STAT=df.DICT_STAT.map({'*': 'KEY', 'R': 'REQUIRED', '*R': 'KEY+REQUIRED',
-                                                                                              'R*': 'KEY+REQUIRED', '': 'OTHER'})))\
+                                                                                              'R*': 'KEY+REQUIRED', 'DEP': 'DEPRECATED', '': 'OTHER'})))\
                                        .assign(HEADING='DATA', DICT_TYPE='HEADING', DICT_REM='', DICT_PGRP='')\
                                        .pipe(lambda df: df.assign(in_group_order=df.in_group_order.astype('int')))\
                                        .pipe(lambda df: df.assign(group_order=df.group_order.astype('int')))
@@ -883,12 +883,8 @@ def _get_DICT_table_from_json_file(filepath):
     # files
     DICT.loc[:, 'DICT_DESC'] = DICT.DICT_DESC.str.replace(r'(")', '\'', regex=True)
 
-    # Drop fields in groupsandheadings4-1-1.json but which should not be
-    # included according to the PDF document
-    # TODO: This part can be removed once these fields are removed from the json file
-    fields_to_be_dropped = ['PMTD_ARM1', 'PMTD_ARM2', 'PMTD_ARM3',
-                            'RUCS_E', 'RUCS_MU', 'RUCS_ESTR', 'RUCS_ETYP']
-    DICT = DICT.loc[~DICT.DICT_HDNG.isin(fields_to_be_dropped), :]
+    # Drop fields that have been deprecated
+    DICT = DICT.loc[DICT.DICT_STAT.ne('DEPRECATED'), :]
 
     return DICT
 
