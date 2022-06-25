@@ -872,6 +872,7 @@ def _get_DICT_table_from_json_file(filepath):
 
     # Found some linebreak characters in the descriptions that are not needed in DICT_DESC
     # Replace them with spaces
+    DICT.loc[:, 'DICT_DESC'] = DICT.DICT_DESC.str.replace(r'(\r\n)', ' ', regex=True)
     DICT.loc[:, 'DICT_DESC'] = DICT.DICT_DESC.str.replace(r'(\n)', ' ', regex=True)
 
     # Some DICT_DESC entries in the json file are enclosed by double quotes.
