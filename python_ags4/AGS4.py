@@ -834,9 +834,10 @@ def _get_DICT_table_from_json_file(filepath):
     heading_rows = DataFrame(json_data).rename(columns={'group': 'DICT_GRP', 'heading': 'DICT_HDNG', 'heading_status': 'DICT_STAT',
                                                         'suggested_type': 'DICT_DTYP', 'description': 'DICT_DESC', 'suggested_unit': 'DICT_UNIT',
                                                         'example': 'DICT_EXMP'})\
-                                       .pipe(lambda df: df.loc[df.group_status.ne('Deprecated'), :])\
+                                       .pipe(lambda df: df.loc[~df.group_status.str.contains('deprecated', case=False), :])\
+                                       .pipe(lambda df: df.loc[~df.DICT_STAT.str.contains(r'dep|deprecated', case=False), :])\
                                        .pipe(lambda df: df.assign(DICT_STAT=df.DICT_STAT.map({'*': 'KEY', 'R': 'REQUIRED', '*R': 'KEY+REQUIRED',
-                                                                                              'R*': 'KEY+REQUIRED', 'DEP': 'DEPRECATED', '': 'OTHER'})))\
+                                                                                              'R*': 'KEY+REQUIRED', '': 'OTHER'})))\
                                        .assign(HEADING='DATA', DICT_TYPE='HEADING', DICT_REM='', DICT_PGRP='')\
                                        .pipe(lambda df: df.assign(in_group_order=df.in_group_order.astype('int')))\
                                        .pipe(lambda df: df.assign(group_order=df.group_order.astype('int')))
@@ -883,9 +884,6 @@ def _get_DICT_table_from_json_file(filepath):
     # quotes to be consistent with the existing built-in standard dictionary
     # files
     DICT.loc[:, 'DICT_DESC'] = DICT.DICT_DESC.str.replace(r'(")', '\'', regex=True)
-
-    # Drop fields that have been deprecated
-    DICT = DICT.loc[DICT.DICT_STAT.ne('DEPRECATED'), :]
 
     return DICT
 
