@@ -834,6 +834,7 @@ def _get_DICT_table_from_json_file(filepath):
     heading_rows = DataFrame(json_data).rename(columns={'group': 'DICT_GRP', 'heading': 'DICT_HDNG', 'heading_status': 'DICT_STAT',
                                                         'suggested_type': 'DICT_DTYP', 'description': 'DICT_DESC', 'suggested_unit': 'DICT_UNIT',
                                                         'example': 'DICT_EXMP'})\
+                                       .pipe(lambda df: df.loc[df.group_status.ne('Deprecated'), :])\
                                        .pipe(lambda df: df.assign(DICT_STAT=df.DICT_STAT.map({'*': 'KEY', 'R': 'REQUIRED', '*R': 'KEY+REQUIRED',
                                                                                               'R*': 'KEY+REQUIRED', 'DEP': 'DEPRECATED', '': 'OTHER'})))\
                                        .assign(HEADING='DATA', DICT_TYPE='HEADING', DICT_REM='', DICT_PGRP='')\
