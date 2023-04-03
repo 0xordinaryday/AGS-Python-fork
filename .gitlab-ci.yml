@@ -43,7 +43,7 @@ pages:
 ## Release to pypi
 deploy_pypi:
   needs:
-    - .test
+    - build-linux
   stage: release
   image: python:3.11
   before_script:
