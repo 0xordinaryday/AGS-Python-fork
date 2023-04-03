@@ -1,6 +1,7 @@
 stages:
   - test
   - deploy_html_docs
+  - release
 
 .test:
   image: python:$PYTHON_VERSION
@@ -15,7 +16,7 @@ stages:
     - python -m pytest -v --ignore=tests/test_batch.py
     - python -m doctest README.md
     - python -m pip install striplog
-    - python -m pytest -v --nbval notebooks/Plot_locations_and_create_strip_log.ipynb
+    - python -m pytest -v --nbval notebooks/Plot_locations_and_create_strip_log.ipynb  
 
 build-linux:
   extends: .test
@@ -30,8 +31,35 @@ pages:
   - cd docs
   - sphinx-build -b html . ../public
   - cp custom.css ../public/_static/custom.css # Custom CSS file to increase width of html pages
+  - echo "Documentation Build Complete" 
   artifacts:
     paths:
     - public
-  #rules:
-  #  - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      allow_failure: true  
+
+
+## Release to pypi
+deploy_pypi:
+  needs:
+    - .test
+  stage: release
+  image: python:3.11
+  before_script:
+    - python3 -m pip install --upgrade twine
+    - python3 -m pip install --upgrade build
+    - sed -i -e "s/v-latest/$CI_COMMIT_TAG/" setup.cfg
+    - cat setup.cfg
+  variables:
+    TWINE_USERNAME: $PYPI_USERNAME
+    TWINE_PASSWORD: $PYPI_PASSWORD
+  script:
+    - echo "$PYPI_USERNAME"
+    - python3 -m build
+    - python3 -m twine upload --skip-existing dist/*
+    - echo "Package Uploaded to PyPI"  
+  only:
+    - tags
+
+
